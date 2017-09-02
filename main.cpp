@@ -25,7 +25,6 @@ void checkFileFail(ifstream&, string);
 int readFile(jobs[], ifstream&);
 void sortJobsArray(jobs[], int);
 void printMenu(jobs[], int);
-void printJobs(jobs[], int);
 void userInput(jobs[], int);
 void searchJobsBySkills(jobs[], int);
 void searchJobsByJobTitle(jobs[], int);
