@@ -53,7 +53,7 @@ int main()
 }
 
 void welcome(){
-    cout << "Welcome to iSearch!\nThis program allows you to search job postings based on job title or skills required for the job.";
+    cout << "Welcome to iSearch!\nThis program allows you to search job postings based on job title or skills required for the job." << endl;
 }
 
 void openFile(ifstream &input, string &inputFile){
@@ -86,10 +86,9 @@ int readFile(jobs jobsArray[], ifstream &input){
 	input.getline(jobsArray[i].jobTitle, MAX_STR_LENGTH);
 	
 	//While not eof and jobs < 10 add data to array
-	//While not eof and jobs < 10 add data to array
 	while(!input.eof() && i < MAX_NUMBER_OF_JOBS){
-	    getline(input, tempString, '\n'); //don't have to eat a new line character
-        jobsArray[i].numberOfSkills = stoi(tempString); 
+        input >> jobsArray[i].numberOfSkills;
+		input.get(c);
         for(int j = 0; j < jobsArray[i].numberOfSkills;){
             for(int k = 0; k < MAX_STR_LENGTH;){
                 input.get(c);
@@ -152,8 +151,8 @@ void userInput(jobs jobArray[], int totalJobs){
             searchJobsByJobTitle(jobArray, totalJobs);
         }
         else{
-            cout << "Invalid Response.\noption> ";
-            cin >> userInput;
+            cout << "Invalid Response." << endl;
+            printMenu(jobArray, totalJobs);
         }
 		printMenu(jobArray, totalJobs);
     }
