@@ -5,7 +5,6 @@
 #include <cstdlib>
 #include <string>
 
-
 using namespace std;
 
 const int MAX_NUMBER_OF_SKILLS = 7;
@@ -13,12 +12,11 @@ const int MAX_NUMBER_OF_JOBS = 10;
 const int MAX_STR_LENGTH = 256;
 
 struct jobs{
-    public:
-        char jobTitle[MAX_STR_LENGTH];
-        int numberOfSkills;
-        char skills[MAX_NUMBER_OF_SKILLS][20];
-        double salary;
-        char companyName[MAX_STR_LENGTH];
+	char jobTitle[MAX_STR_LENGTH];
+	int numberOfSkills;
+	char skills[MAX_NUMBER_OF_SKILLS][20];
+	double salary;
+	char companyName[MAX_STR_LENGTH];
 };
 
 void welcome();
@@ -26,13 +24,16 @@ void openFile(ifstream&, string&);
 void checkFileFail(ifstream&, string);
 int readFile(jobs[], ifstream&);
 void sortJobsArray(jobs[], int);
-void printMenu();
+void printMenu(jobs[], int);
 void printJobs(jobs[], int);
 void userInput(jobs[], int);
 void searchJobsBySkills(jobs[], int);
 void searchJobsByJobTitle(jobs[], int);
-void printFoundJobTitle(jobs, char[]);
-void printFoundJobSkills(jobs, char[]);
+void printFoundJob(jobs);
+void printFoundJobSkills(jobs);
+void printJobSkillHeader(char[]);
+void printJobTitleHeader(char[]);
+void toUpperFirstChar(char[]);
 void toLower(char[]);
 void printGoodBye();
 
@@ -48,16 +49,15 @@ int main()
     checkFileFail(input, inputFile);
     totalJobs = readFile(jobsArray, input);
     sortJobsArray(jobsArray, totalJobs);
-    printMenu();
-    userInput(jobsArray, totalJobs);
+	printMenu(jobsArray, totalJobs);
 }
 
 void welcome(){
-    cout << "Welcome to this program\n";
+    cout << "Welcome to iSearch!\nThis program allows you to search job postings based on job title or skills required for the job.";
 }
 
 void openFile(ifstream &input, string &inputFile){
-    cout << "Enter the input file name: ";
+    cout << "Enter the file name: ";
 	cin >> inputFile;
 	input.open(inputFile.c_str( ));
 }
@@ -84,6 +84,9 @@ int readFile(jobs jobsArray[], ifstream &input){
     string tempString;
     
 	input.getline(jobsArray[i].jobTitle, MAX_STR_LENGTH);
+	
+	//While not eof and jobs < 10 add data to array
+	//While not eof and jobs < 10 add data to array
 	while(!input.eof() && i < MAX_NUMBER_OF_JOBS){
 	    getline(input, tempString, '\n'); //don't have to eat a new line character
         jobsArray[i].numberOfSkills = stoi(tempString); 
@@ -129,11 +132,13 @@ void sortJobsArray(jobs jobsArray[], int totalJobs){
 	}
 }
 
-void printMenu(){
+void printMenu(jobs jobArray[], int totalJobs){
     cout << "1 Search for a job by skill" << endl;
     cout << "2 Search for a job by title" << endl;
     cout << "3 Quit" << endl;
     cout << "option> ";
+	cin.clear();
+	userInput(jobArray, totalJobs);
 }
 
 void userInput(jobs jobArray[], int totalJobs){
@@ -150,6 +155,7 @@ void userInput(jobs jobArray[], int totalJobs){
             cout << "Invalid Response.\noption> ";
             cin >> userInput;
         }
+		printMenu(jobArray, totalJobs);
     }
     printGoodBye();
 }
@@ -157,15 +163,16 @@ void userInput(jobs jobArray[], int totalJobs){
 void searchJobsBySkills(jobs jobArray[], int totalJobs){
     char searchString[MAX_STR_LENGTH];
     char tempStr[MAX_STR_LENGTH];
-    cout << "Please enter what skill you wish to search for: ";
+    cout << "Please enter what skill you want to search for: ";
     cin >> searchString;
     toLower(searchString);
+	printJobSkillHeader(searchString);
     for(int i = 0; i < totalJobs; i++){
         for(int j = 0; j < jobArray[i].numberOfSkills; j++){
             strcpy(tempStr, jobArray[i].skills[j]);
             toLower(tempStr);
             if(strcmp(searchString, tempStr) == 0){
-                printFoundJobSkills(jobArray[i], searchString);
+                printFoundJobSkills(jobArray[i]);
             }
         }
     }
@@ -177,30 +184,43 @@ void searchJobsByJobTitle(jobs jobArray[], int totalJobs){
     cout << "Please enter what job title you want to search for: ";
     cin >> searchString;
     toLower(searchString);
+	printJobTitleHeader(searchString);
     for(int i = 0; i < totalJobs; i++){
         strcpy(tempStr, jobArray[i].jobTitle);
         toLower(tempStr);
         if(strstr(tempStr, searchString) != NULL){
-            printFoundJobTitle(jobArray[i], searchString);
+            printFoundJob(jobArray[i]);
         }
     }
 }
 
-void printFoundJobTitle(jobs job, char searchString[]){
-    cout << job.jobTitle << endl;
+void printJobTitleHeader(char searchString[]){
+	cout << endl;
+    cout << "Job Title: " << searchString << endl;
+    cout << "Job Title" << setw(47) << "Salary" << setw(22) << "Company" << endl;
+    cout << "---------------------------------------------------------------------------------------------" << endl;
 }
 
-void printFoundJobSkills(jobs job, char searchString[]){
+void printJobSkillHeader(char searchString[]){
+	cout << endl;
     cout << "Job Skill: " << searchString << endl;
-    cout << "Job Title"  << setw(50) << "Salary" << setw(25) << "Company"  << endl;
-    cout << "-------------------------------------------------------------------------------------------" << endl;
-    cout << job.jobTitle << right;
-    cout << setw(25) << job.salary << left << setw(25);
-    cout << setw(25) << job.companyName << endl;
+    cout << "Job Title" << setw(47) << "Salary" << setw(22) << "Company" << endl;
+    cout << "---------------------------------------------------------------------------------------------" << endl;
+}
+
+void printFoundJob(jobs job){
+    cout << setw(50) << left << job.jobTitle << "$" << setw(20) << job.salary << right << job.companyName << endl;
     cout << endl;
 }
+
+void printFoundJobSkills(jobs job){
+    cout << setw(50) << left << job.jobTitle << "$" << setw(20) << job.salary << right << job.companyName << endl;
+    cout << endl;
+}
+
 void printGoodBye(){
-    cout << "Thanks for using this program!\nGoodBye.";    
+    cout << "Thanks for using this program!\nGoodBye.";
+	exit(0);
 }
 
 void toLower(char charArray[]){
@@ -208,4 +228,3 @@ void toLower(char charArray[]){
         charArray[i] = tolower(charArray[i]);
     }
 }
-
