@@ -208,11 +208,17 @@ void printJobSkillHeader(char searchString[]){
 
 void printFoundJob(jobs job){
     cout << setw(50) << left << job.jobTitle << "$" << setw(20) << job.salary << right << job.companyName << endl;
+	for(int i = 0; i < job.numberOfSkills; i++){
+		cout << "    " << setw(10) << left << job.skills[i]  << endl;
+	}
     cout << endl;
 }
 
 void printFoundJobSkills(jobs job){
     cout << setw(50) << left << job.jobTitle << "$" << setw(20) << job.salary << right << job.companyName << endl;
+	for(int i = 0; i < job.numberOfSkills; i++){
+		cout << "    " << setw(10) << left << job.skills[i] << endl;
+	}
     cout << endl;
 }
 
