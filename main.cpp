@@ -1,3 +1,10 @@
+/*	File: lab1.cpp
+*		Author: Matt Clinard
+*		Date: 9/5/2017
+* 	This application allows the user to get information about programming jobs
+*		in the Knoxville area.
+*/
+
 #include <iostream>
 #include <iomanip>
 #include <cstring>
@@ -51,16 +58,30 @@ int main()
 	printMenu(jobsArray, totalJobs);
 }
 
+/* welcome: This function welcomes the user and gives a brief description of the program.
+*  Parameters: none
+*	 Returns: nothing
+*/
 void welcome(){
     cout << "Welcome to iSearch!\nThis program allows you to search job postings based on job title or skills required for the job." << endl;
 }
 
+/* openFile: This function asks the user for the inputFile name and opens the ifstream
+*  Parameters: input - ifstream variable name
+* 						 inputFile - string that the user enters
+*	 Returns: nothing
+*/
 void openFile(ifstream &input, string &inputFile){
     cout << "Enter the file name: ";
 	cin >> inputFile;
 	input.open(inputFile.c_str( ));
 }
 
+/* checkFileFail: This function checks to make sure the file does exist and is not empty.
+*  Parameters: input - ifstream variable name
+* 						 inputFile - string that the user enters
+*	 Returns: Nothing
+*/
 void checkFileFail(ifstream &input, string inputFile){
     char c;
 
@@ -77,13 +98,20 @@ void checkFileFail(ifstream &input, string inputFile){
 	return;
 }
 
+/* readFile: Reads the file and puts each job object into an array of structures
+*  Parameters: jobsArray - an array of job structures
+							 input - ifstream variable name
+	 Precondition: File exists, is valid, and has opened successfully
+	 Postcondition: array of job structures filled to i
+*	 Returns: number of job structures created
+*/
 int readFile(jobs jobsArray[], ifstream &input){
     int i = 0;
     char c;
     string tempString;
-    
+
 	input.getline(jobsArray[i].jobTitle, MAX_STR_LENGTH);
-	
+
 	//While not eof and jobs < 10 add data to array
 	while(!input.eof() && i < MAX_NUMBER_OF_JOBS){
         input >> jobsArray[i].numberOfSkills;
@@ -92,6 +120,7 @@ int readFile(jobs jobsArray[], ifstream &input){
             for(int k = 0; k < MAX_STR_LENGTH;){
                 input.get(c);
                 if(c == '\n'){
+									jobsArray[i].skills[j][k] = '\0';
                     k = 0;
                     j++;
                 }
@@ -104,16 +133,24 @@ int readFile(jobs jobsArray[], ifstream &input){
                 }
             }
         }
-        
+
         input >> jobsArray[i].salary;
         input.get(c); //eat new line char
         input.getline(jobsArray[i].companyName, MAX_STR_LENGTH);
         i++;
         input.getline(jobsArray[i].jobTitle, MAX_STR_LENGTH);
 	}
+	input.close();
 	return i;
 }
 
+/* sortJobsArray: Sorts the jobsArray once the array of structures has been populated
+*  Parameters: jobsArray - an array of job structures
+* 						 totalJobs - total number of jobs within the jobArray
+*	 Precondition: jobsArray has job objects
+*  Postcondition: Array of job structures is sorted by jobTitle
+*	 Returns: Nothing
+*/
 void sortJobsArray(jobs jobsArray[], int totalJobs){
 	int minIndex, i, top;
 	jobs tempJob;
@@ -130,6 +167,11 @@ void sortJobsArray(jobs jobsArray[], int totalJobs){
 	}
 }
 
+/* printMenu: Prints the menu for the user
+*  Parameters: jobArray - an array of job structures
+* 						 totalJobs - total number of jobs within the jobArray
+*	 Returns: Nothing
+*/
 void printMenu(jobs jobArray[], int totalJobs){
     cout << "1 Search for a job by skill" << endl;
     cout << "2 Search for a job by title" << endl;
@@ -139,6 +181,12 @@ void printMenu(jobs jobArray[], int totalJobs){
 	userInput(jobArray, totalJobs);
 }
 
+/* userInput: This function contains the logic to determine where to go following
+							input from the user
+*  Parameters: jobArray - an array of job structures
+							 totalJobs - total number of jobs within the jobArray
+*	 Returns: Nothing
+*/
 void userInput(jobs jobArray[], int totalJobs){
     char userInput[5];
     cin >> userInput;
@@ -158,6 +206,11 @@ void userInput(jobs jobArray[], int totalJobs){
     printGoodBye();
 }
 
+/* searchJobsBySkills: This method searches for jobs in the jobArray by skills.
+*  Parameters: jobArray - an array of job structures
+							 totalJobs - total number of jobs within the jobArray
+*	 Returns: Nothing
+*/
 void searchJobsBySkills(jobs jobArray[], int totalJobs){
     char searchString[MAX_STR_LENGTH];
     char tempStr[MAX_STR_LENGTH];
@@ -176,6 +229,11 @@ void searchJobsBySkills(jobs jobArray[], int totalJobs){
     }
 }
 
+/* searchJobsByJobTitle : This method searches for jobs in the jobArray by title.
+*  Parameters: jobArray - an array of job structures
+							 totalJobs - total number of jobs within the jobArray
+*	 Returns: Nothing
+*/
 void searchJobsByJobTitle(jobs jobArray[], int totalJobs){
     char searchString[MAX_STR_LENGTH];
     char tempStr[MAX_STR_LENGTH];
@@ -192,6 +250,10 @@ void searchJobsByJobTitle(jobs jobArray[], int totalJobs){
     }
 }
 
+/* printJobTitleHeader: Prints the header for jobs found searching by job title
+*  Parameters: searchString - a character array that contains the users search term
+*	 Returns: Nothing
+*/
 void printJobTitleHeader(char searchString[]){
 	cout << endl;
     cout << "Job Title: " << searchString << endl;
@@ -199,6 +261,10 @@ void printJobTitleHeader(char searchString[]){
     cout << "---------------------------------------------------------------------------------------------" << endl;
 }
 
+/* printJobSkillHeader: Prints the header for jobs found by searching by skill
+*  Parameters: searchString - a character array that contains the users search term
+*	 Returns: Nothing
+*/
 void printJobSkillHeader(char searchString[]){
 	cout << endl;
     cout << "Job Skill: " << searchString << endl;
@@ -206,6 +272,10 @@ void printJobSkillHeader(char searchString[]){
     cout << "---------------------------------------------------------------------------------------------" << endl;
 }
 
+/* printFoundJob: Prints a job object that the search functions found relevent to searched term.
+*  Parameters: job - a job object that was found by the searchJobsByTitle function
+*	 Returns: Nothing
+*/
 void printFoundJob(jobs job){
     cout << setw(50) << left << job.jobTitle << "$" << setw(20) << job.salary << right << job.companyName << endl;
 	for(int i = 0; i < job.numberOfSkills; i++){
@@ -214,6 +284,10 @@ void printFoundJob(jobs job){
     cout << endl;
 }
 
+/* printFoundJobSkills: Prints a job object that the search functions found relevent to searched term.
+*  Parameters: job - a job object that was found by the searchJobsBySkills function
+*	 Returns: Nothing
+*/
 void printFoundJobSkills(jobs job){
     cout << setw(50) << left << job.jobTitle << "$" << setw(20) << job.salary << right << job.companyName << endl;
 	for(int i = 0; i < job.numberOfSkills; i++){
@@ -222,11 +296,19 @@ void printFoundJobSkills(jobs job){
     cout << endl;
 }
 
+/* printGoodBye: Gives the user a farewell message and exits the program
+*  Parameters: None
+*	 Returns: Nothing
+*/
 void printGoodBye(){
     cout << "Thanks for using this program!\nGoodBye.";
 	exit(0);
 }
 
+/* toLower: This function lowercases the users search input
+*  Parameters: charArray - an array of characters
+*	 Returns: Nothing
+*/
 void toLower(char charArray[]){
     for(int i = 0; i < MAX_STR_LENGTH; i++){
         charArray[i] = tolower(charArray[i]);
