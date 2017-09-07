@@ -14,7 +14,7 @@
 
 using namespace std;
 
-const int MAX_NUMBER_OF_SKILLS = 7;
+const int MAX_NUMBER_OF_SKILLS = 10;
 const int MAX_NUMBER_OF_JOBS = 10;
 const int MAX_STR_LENGTH = 256;
 
@@ -63,7 +63,9 @@ int main()
 *	 Returns: nothing
 */
 void welcome(){
-    cout << "Welcome to iSearch!\nThis program allows you to search job postings based on job title or skills required for the job." << endl;
+    printf( "Welcome to iSearch!\nThis program allows you to search job postings based on job title or skills required for the job.\n");
+	fflush(stdout);
+	fflush(stdin);
 }
 
 /* openFile: This function asks the user for the inputFile name and opens the ifstream
@@ -120,7 +122,7 @@ int readFile(jobs jobsArray[], ifstream &input){
             for(int k = 0; k < MAX_STR_LENGTH;){
                 input.get(c);
                 if(c == '\n'){
-									jobsArray[i].skills[j][k] = '\0';
+					jobsArray[i].skills[j][k] = '\0';
                     k = 0;
                     j++;
                 }
@@ -214,19 +216,33 @@ void userInput(jobs jobArray[], int totalJobs){
 void searchJobsBySkills(jobs jobArray[], int totalJobs){
     char searchString[MAX_STR_LENGTH];
     char tempStr[MAX_STR_LENGTH];
+	int numFoundJobs = 0;
+	jobs tempJobArray[MAX_NUMBER_OF_JOBS];
+
     cout << "Please enter what skill you want to search for: ";
     cin >> searchString;
     toLower(searchString);
-	printJobSkillHeader(searchString);
+
     for(int i = 0; i < totalJobs; i++){
         for(int j = 0; j < jobArray[i].numberOfSkills; j++){
             strcpy(tempStr, jobArray[i].skills[j]);
             toLower(tempStr);
             if(strcmp(searchString, tempStr) == 0){
-                printFoundJobSkills(jobArray[i]);
+				tempJobArray[numFoundJobs] = jobArray[i];
+				numFoundJobs++;
             }
         }
     }
+
+	if(numFoundJobs == 0){
+		cout << "No jobs found with that search query." << endl;
+		return;
+	}
+
+	printJobSkillHeader(searchString);
+	for(int i = 0; i < numFoundJobs; i++){
+		printFoundJobSkills(tempJobArray[i]);
+	}
 }
 
 /* searchJobsByJobTitle : This method searches for jobs in the jobArray by title.
@@ -237,17 +253,36 @@ void searchJobsBySkills(jobs jobArray[], int totalJobs){
 void searchJobsByJobTitle(jobs jobArray[], int totalJobs){
     char searchString[MAX_STR_LENGTH];
     char tempStr[MAX_STR_LENGTH];
-    cout << "Please enter what job title you want to search for: ";
+	int numberFoundJobs = 0;
+	jobs tempJobsArray[MAX_NUMBER_OF_JOBS] = {'\0'}; //initialize all elements of tempJobsArray to null characters for troubleshooting reference
+
+	//Ask user for input
+    printf("Please enter what job title you want to search for: ");
     cin >> searchString;
     toLower(searchString);
-	printJobTitleHeader(searchString);
+
     for(int i = 0; i < totalJobs; i++){
+		memset(tempStr, '\0', sizeof(tempStr)); //sets all elements of tempStr to null characters
         strcpy(tempStr, jobArray[i].jobTitle);
         toLower(tempStr);
+
+		//if at any point a match is found within the tempstr add job to tempJobsArray
         if(strstr(tempStr, searchString) != NULL){
-            printFoundJob(jobArray[i]);
+            tempJobsArray[numberFoundJobs] = jobArray[i];
+			numberFoundJobs++;
         }
     }
+
+	//if no jobs are found return
+	if(numberFoundJobs == 0){
+		printf("No jobs found with that search query.\n");
+		return;
+	}
+
+	printJobTitleHeader(searchString);
+	for(int k = 0; k < numberFoundJobs; k++){
+		printFoundJob(tempJobsArray[k]);
+	}
 }
 
 /* printJobTitleHeader: Prints the header for jobs found searching by job title
@@ -255,10 +290,10 @@ void searchJobsByJobTitle(jobs jobArray[], int totalJobs){
 *	 Returns: Nothing
 */
 void printJobTitleHeader(char searchString[]){
-	cout << endl;
-    cout << "Job Title: " << searchString << endl;
-    cout << "Job Title" << setw(47) << "Salary" << setw(22) << "Company" << endl;
-    cout << "---------------------------------------------------------------------------------------------" << endl;
+	printf("Job Title: %s\n", searchString);
+	printf("%-50s%-21s%s\n", "Job Title", "Salary", "Company");
+    printf("%s\n","----------------------------------------------------------------------------------------------");
+	fflush(stdout);
 }
 
 /* printJobSkillHeader: Prints the header for jobs found by searching by skill
@@ -266,10 +301,10 @@ void printJobTitleHeader(char searchString[]){
 *	 Returns: Nothing
 */
 void printJobSkillHeader(char searchString[]){
-	cout << endl;
-    cout << "Job Skill: " << searchString << endl;
-    cout << "Job Title" << setw(47) << "Salary" << setw(22) << "Company" << endl;
-    cout << "---------------------------------------------------------------------------------------------" << endl;
+	printf("Job Skill: %s\n", searchString);
+	printf("%-50s%-21s%s\n", "Job Title", "Salary", "Company");
+    printf("%s\n","----------------------------------------------------------------------------------------------");
+	fflush(stdout);
 }
 
 /* printFoundJob: Prints a job object that the search functions found relevent to searched term.
@@ -277,11 +312,13 @@ void printJobSkillHeader(char searchString[]){
 *	 Returns: Nothing
 */
 void printFoundJob(jobs job){
-    cout << setw(50) << left << job.jobTitle << "$" << setw(20) << job.salary << right << job.companyName << endl;
+	printf("%-50s%s%-20.2f%s\n",job.jobTitle, "$", job.salary, job.companyName);
+	fflush(stdout);
 	for(int i = 0; i < job.numberOfSkills; i++){
-		cout << "    " << setw(10) << left << job.skills[i]  << endl;
+		printf("     %-s\n", job.skills[i]);
+		fflush(stdout);
 	}
-    cout << endl;
+    printf("\n");
 }
 
 /* printFoundJobSkills: Prints a job object that the search functions found relevent to searched term.
@@ -289,11 +326,13 @@ void printFoundJob(jobs job){
 *	 Returns: Nothing
 */
 void printFoundJobSkills(jobs job){
-    cout << setw(50) << left << job.jobTitle << "$" << setw(20) << job.salary << right << job.companyName << endl;
+	printf("%-50s%s%-20.2f%s\n",job.jobTitle, "$", job.salary, job.companyName);
+	fflush(stdout);
 	for(int i = 0; i < job.numberOfSkills; i++){
-		cout << "    " << setw(10) << left << job.skills[i] << endl;
+		printf("     %-s\n", job.skills[i]);
+		fflush(stdout);
 	}
-    cout << endl;
+    printf("\n");
 }
 
 /* printGoodBye: Gives the user a farewell message and exits the program
